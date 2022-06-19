@@ -1,4 +1,4 @@
-![.](logos.png)
+![.](11.png)
 
 # Inferencia e introducción a los modelos estadísticos con R
 
