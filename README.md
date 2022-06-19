@@ -67,7 +67,7 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 * Evaluación de supuestos
 * Efectos marginales
 
-## I. Introducción a los modelos generalizados: logit
+## V. Introducción a los modelos generalizados: logit
 * Simple
 * Múltiple
 * Evaluación de supuestos
@@ -87,7 +87,7 @@ Wickham, H., & Grolemund, G. (2016). R for data science: Import, tidy, transform
 
 Este es un curso es continuación de otro realizado en 2021 puedes consultarlo [acá](https://aniuxa.github.io/CursoR-posgrado/)
 
-También hubo una versión enero de 2020 [acá](https://aniuxa.github.io/CursoR-posgrado/)
+También hubo una versión enero de 2022 [acá](https://aniuxa.github.io/posgrado_modelo/)
 
 
 # Agradecimiento
