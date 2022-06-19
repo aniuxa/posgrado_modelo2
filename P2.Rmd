@@ -1,0 +1,520 @@
+---
+title: "Práctica 2"
+author: "Ana Escoto"
+date: "1/11/2022"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+  # github_document:
+  #   toc: true
+  #   toc_depth: 2
+  # pdf_document:
+  #   latex_engine: xelatex
+---
+\newpage 
+\tableofcontents 
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Paquetes
+
+```{r}
+if (!require("pacman")) install.packages("pacman")#instala pacman si se requiere
+pacman::p_load(tidyverse,
+               readxl,
+               writexl, 
+               haven,
+               sjlabelled, 
+               janitor,
+               infer, 
+               ggpubr,
+               magrittr,
+               gt,
+               GGally,
+               broom,
+               DescTools,
+               wesanderson)
+```
+
+
+# Cargando los datos
+
+Desde STATA
+```{r}
+ags_t321 <- read_dta("./datos/AGS_SDEMT321.dta", encoding="latin1") %>% 
+  clean_names()
+
+```
+
+Desde Excel:
+
+```{r}
+ICI_2021 <- read_excel("./datos/ICI_2021.xlsx",
+                               sheet = "para_importar") %>% 
+  clean_names()
+
+```
+
+
+```{r}
+ags_t321 %<>%
+  filter(r_def==0) %>% 
+  filter(!c_res==2)
+```
+
+
+# Visualización de datos, un pequeño disclaimer
+Hay cursos específicos de visualización de datos. Es maravilloso pero también requiere que estudiemos bien qué tipo de datos tenemos y cuáles son nuestros objetivos. 
+
+Me gusta mucho este recurso: <https://www.data-to-viz.com/>
+
+##  Gráficos de base
+
+"plot()" Es la función más simple. 
+
+```{r}
+  plot(as_label(ags_t321$niv_ins))
+```
+
+Esto es igual que:
+
+```{r}
+barplot(table(as_label(ags_t321$niv_ins)))
+```
+
+Histograma y el boxplot
+
+```{r}
+hist(ICI_2021$esperanza_de_vida)
+```
+
+
+```{r}
+boxplot(ICI_2021$esperanza_de_vida)
+```
+
+
+
+# *Grammar of graphics: ggplot*
+
+Hoy vamos a presentar a un gran paquete ¡Es de los famosos! Y tiene más de diez años.
+
+* <https://qz.com/1007328/all-hail-ggplot2-the-code-powering-all-those-excellent-charts-is-10-years-old/>
+
+"gg" proviene de "Grammar of Graphics", funciona un poco como sintácticamente, de ahí su nombre.
+
+Algunos recursos para aprender ggplot
+
+* <https://ggplot2-book.org/> hecha por el mero mero.
+
+* <http://sape.inf.usi.ch/quick-reference/ggplot2> 
+
+* <https://raw.githubusercontent.com/rstudio/cheatsheets/master/data-visualization-2.1.pdf>
+
+Vamos a revisar una presentación que es muy interesante
+
+* <https://evamaerey.github.io/ggplot2_grammar_guide/ggplot2_grammar_guide.html>
+
+* <https://huygens.science.uva.nl/ggPlotteR/> Hace gráficos de ggplot con la base de datos de Gapminder
+
+# Un lienzo para dibujar
+
+Para hacer un gráfico, ggplot2 tiene el comando "ggplot()".  Hacer gráficos con esta función tiene una lógica  aditiva. Lo ideal es que iniciemos estableciendo el mapeo estético de nuestro gráfico, con el comando aes()
+
+```{r}
+g1<-ags_t321 %>%
+  ggplot(aes(as_label(niv_ins)))
+
+g1 # imprime el lienzo
+```
+
+
+
+# Gráficos univariados
+
+## Para cualitativas
+
+```{r}
+g1 + geom_bar()
+```
+
+
+```{r}
+g1 +  geom_bar(aes(
+  fill = as_label(niv_ins)
+  )) # colorea la geometría
+
+# Esto es equivalente
+
+ags_t321 %>%
+  ggplot(aes(as_label(niv_ins),
+             fill = as_label(niv_ins)
+             )
+         ) + geom_bar()
+
+```
+
+## Para variables cuantitativas
+Podemos hacer histogramas y gráficos de densidad, de manera fácil. La idea es agregar en nuestro "lienzo" una geometría, un valor para dibujar en él. Esto se agrega con un "+" y con la figura que se añadirá a nuestro gráfico.
+
+```{r}
+g2<-ags_t321 %>%
+  ggplot(aes(eda))
+
+g2 # imprime el lienzo
+```
+
+### Histograma
+```{r}
+g2 + geom_histogram() 
+```
+
+
+## Intro a dos variables
+
+Vamos a terminar con un código que resume mucho de lo que hemos visto hoy:
+
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>%  # nos quedamos sólo con los ocupados
+  select(eda, ing_x_hrs, anios_esc) %>% 
+  GGally::ggpairs()
+```
+
+
+# Introducción a la inferencia
+
+
+## Hipótesis e intervalos de confianza
+
+### t-test
+Este comando nos sirve para calcular diferentes tipos de test, que tienen como base la distribución t
+
+<b>Univariado para estimación</b>
+
+```{r}
+t.test(ags_t321$ing_x_hrs) # pero no tenemos los filtro
+```
+
+Un truco para poder utilizar funciones de base con formato *tidy*
+
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  with(
+    t.test(ing_x_hrs)
+  )
+```
+
+Vamos a quedarnos a con esta población objetivo:
+
+
+<b>Univariado para hipótesis específica</b>
+
+$$ H_o:\mu=40 $$
+$$ H_{a1}: \mu < 40 $$
+$$ H_{a2}: \mu \neq 40 $$
+$$ H_{a3}: \mu > 40 $$
+Si hacemos explícita la $H_0$
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  with(
+    t.test(ags_t321$ing_x_hrs, mu=40)
+    )
+```
+
+Para hacer explícitas las hipótesis alternativas
+
+
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  with(
+  t.test(ags_t321$ing_x_hrs, mu=40, alternative = "two.sided") #default y de dos colas
+    )
+```
+
+
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  with(
+  t.test(ags_t321$ing_x_hrs, mu=40, alternative = "greater") # cola derecha
+    )
+```
+
+
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  with(
+  t.test(ags_t321$ing_x_hrs, mu=40, alternative = "less") # cola izquierda
+    )
+```
+
+### Enchulando un poquito
+
+Los resultados tienen la info, pero la podemos almacenar en un objeto. Con los cálculos de modelos es muy útil guardarlos para compararlos.
+
+```{r}
+t.test0<-ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  with(
+    t.test(ags_t321$ing_x_hrs, mu=40)
+    )
+```
+
+Veamos si lo imprimimos
+```{r}
+t.test0
+```
+
+```{r}
+broom::tidy(t.test0)
+```
+La función "tidy()" hace que el resultado se vuelva un "tibble", una tabla muy compatible con el tidyverse. Esto puede ser útil cuando queremos ir comparando estimaciones.
+
+Anteriormente vimos con base cómo hacer inferencia. El paquete "infer" tiene también elementos para inferencia, pero en formato más compatible con tidyverse.
+
+```{r}
+ags_t321 %>% 
+  filter(clase2==1) %>% #Filtro de ocupados
+  filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+  infer::t_test(response = ing_x_hrs, mu = 40)
+
+```
+
+Como vemos nos da el mismo resultado anterior, pero nos da directamente el resultado en formato tidy.
+
+Si solo queremos el estimador de "t"
+```{r}
+ags_t321 %>% 
+t_stat(response = ing_x_hrs, mu = 40)
+
+```
+
+Más de este paquete <https://infer.netlify.app/>
+
+
+## Proporción 
+
+Vamos a revisar la proporción de hombres y mujeres en términos de participación laboral.
+
+El comando de base es menos flexible: 
+```{r}
+prop<-table(ags_t321[ags_t321$clase1>0,]$clase1)
+prop.test(prop)
+```
+
+Los filtros se complican un poco...
+
+```{r}
+ags_t321 %>% 
+  filter(eda>14 & eda<99) %>% 
+  mutate(clase1=as_label(clase1)) %>% #oo
+  tabyl(clase1)
+```
+
+
+Vamos a aprovechar para re-etiquetar la variable clase1
+
+```{r}
+etiqueta_pea<-c("PEA", "PNEA") # un vector con las etiquetas
+```
+
+
+```{r}
+ags_t321 %>% 
+  filter(eda>14 & eda<99) %>% 
+  sjlabelled::set_labels(clase1, labels=etiqueta_pea) %>% 
+  mutate(clase1=as_label(clase1)) %>% 
+  tabyl(clase1)
+
+```
+
+En formato tidy
+```{r}
+
+ags_t321 %>% 
+  filter(eda>14 & eda<99) %>% 
+  with(
+    table(clase1)
+    ) %>% 
+  prop.test()
+
+```
+
+En base necesita que se alimente de un objeto tipo table, el cual es menos manejable. Por eso utilizaremos más el paquete *infer*
+
+```{r}
+ags_t321 %>% 
+  filter(eda>14 & eda<99) %>% 
+  set_labels(clase1, labels=etiqueta_pea) %>% 
+  mutate(clase1=as_label(clase1)) %>%   
+  infer::prop_test(clase1 ~ NULL  ,
+             p=0.7, 
+            alternative="less")
+
+
+# Para que nos dé Z
+ags_t321 %>% 
+  filter(eda>14 & eda<99) %>% 
+  set_labels(clase1, labels=etiqueta_pea) %>% 
+  mutate(clase1=as_label(clase1)) %>%   
+  infer::prop_test(clase1 ~ NULL  ,
+            p=0.7, 
+            alternative="less",
+            success = "PEA", # necesitamos establecer el éxito
+            z=TRUE)
+
+```
+
+
+
+# Estimaciones bivariadas
+
+## Diferencias de medias por grupos
+¿Podemos decir, con significancia estadística que los valores medios de una variable son diferentes entre los grupos?
+
+```{r}
+ags_t321 %>% 
+    filter(ags_t321$clase2==1) %>% # nos quedamos con los trabajadores
+    filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos
+    group_by(as_label(sex)) %>%
+    summarise(avg_hrs = mean(ing_x_hrs, na.rm=T))
+
+ags_t321 %>% 
+    filter(ags_t321$clase2==1) %>% # nos quedamos con los trabajadores
+    filter(ing_x_hrs>0) %>% #Filtros de quienes reportaron ingresos 
+    with(
+      t.test(ing_x_hrs~sex)
+      )
+```
+
+Con "infer" sería:
+
+```{r}
+ags_t321 %>% 
+  mutate(sex=as_label(sex)) %>% 
+  infer::t_test(ing_x_hrs ~ sex, order = c("Hombre", "Mujer") )
+```
+
+## Diferencias de proporciones.
+
+En la versión tidy de infer será más fácil hacer la versión de dos proporciones.
+
+
+```{r}
+
+ags_t321 %>% 
+  filter(eda>14 & eda<99) %>% 
+  set_labels(clase1, labels=etiqueta_pea) %>% 
+  mutate(clase1=as_label(clase1)) %>% 
+  mutate(sex=as_label(sex)) %>% 
+  infer::prop_test(clase1 ~ sex ,
+                   alternative="greater",
+                   success = "PEA", # necesitamos establecer el éxito
+                   order = c("Hombre", "Mujer"),
+                   z=TRUE)
+
+```
+
+
+# Estimación de varianzas y sus pruebas de hipótesis
+
+Para poder hacer inferencia sobre la varianza utilizamos el comando varTest() del paquete "DescTools"
+
+```{r}
+ags_t321 %>% 
+    filter(clase2==1) %>% 
+      with(
+        DescTools::VarTest(ing_x_hrs)
+        )
+
+```
+
+Podemos también decir algo sobre el valor objetivo de nuestra hipótesis
+```{r}
+ags_t321 %>% 
+    filter(clase2==1) %>% 
+      with(
+        VarTest(ing_x_hrs, sigma.squared = 100)
+        )
+
+```
+
+
+$$ H_o:\sigma=100 $$
+$$ H_{a1}: \sigma < 100 $$
+$$ H_{a2}: \sigma \neq 100 $$
+$$ H_{a3}: \sigma > 100 $$
+
+
+Guardar como objeto nuestros resultados, siempres muy conveniente para pedir después o para realizar operaciones con ellos
+
+```{r}
+test2<-ags_t321 %>% 
+    filter(clase2==1) %>% 
+      with(VarTest(ing_x_hrs))
+
+test2$conf.int
+sqrt(test2$conf.int) ## sacamos la raíz cuadrada para tener las
+#desviaciones estándar y sea más fácil de interpretar
+```
+
+Con tidy de "broom"
+
+```{r}
+tidy(test2)
+```
+
+
+# Estimación de diferencias de varianzas y sus pruebas de hipótesis
+
+Para comparar varianza, usamos su "ratio", esto nos da un estadístico de prueba F, para comparar dos muestras de poblaciones normales.
+
+Si lo que queremos es comparar la varianza entre dos grupos, usamos el signo ~
+```{r}
+ags_t321 %>% 
+    filter(clase2==1) %>% 
+      with(var.test(ing_x_hrs ~ as_label(sex), ratio=1))
+```
+
+
+Por ejemplo, para el caso de la desigualdad, las hipótesis serían de esta forma
+
+$$H_o:\frac{\sigma_1^2}{\sigma_2^2}=1$$
+$$H_a:\frac{\sigma_1^2}{\sigma_2^2}\neq1$$
+
+
+
+# Prueba chi-cuadrado chi-sq. Una aplicación más común
+
+Cuando tenemos dos variables cualitativas o nominales podemos hacer esta la prueba chi-cuadrado, o prueba de independencia. Esta tiene una lógica un poco diferente a las pruebas que hacemos, porque proviene de comparar la distribución de los datos dado que no hay independencia entre las variables y los datos que tenemos.
+
+La hipótesis nula postula una distribución de probabilidad totalmente especificada como el modelo matemático de la población que ha generado la muestra, por lo que si la rechazamos hemos encontrado evidencia estadística sobre la dependencia de las dos variables.
+
+
+$$H_o:\text{Las variables son independientes}$$
+$$H_a:\text{Las variables no son independientes}$$
+
+```{r}
+ags_t321 %>% 
+  mutate_all(vars(clase2, sex), as_label) %>% 
+  tabyl(clase2, sex) %>% 
+  janitor::chisq.test() #ojo
+```
+

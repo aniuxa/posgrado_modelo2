@@ -1,0 +1,373 @@
+---
+title: "Práctica 3"
+author: "Ana Escoto"
+date: "1/11/2022"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+  # github_document:
+  #   toc: true
+  #   toc_depth: 2
+  # pdf_document:
+  #   latex_engine: xelatex
+---
+\newpage 
+\tableofcontents 
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Paquetes
+
+```{r}
+if (!require("pacman")) install.packages("pacman")#instala pacman si se requiere
+pacman::p_load(tidyverse,
+               readxl,
+               writexl, 
+               haven,
+               sjlabelled, 
+               janitor,
+               infer, 
+               ggpubr,
+               magrittr,
+               gt,
+               GGally,
+               broom,
+               DescTools,
+               wesanderson,
+               gtsummary,
+               srvyr,
+               car,
+               sjPlot,
+               jtools,
+               sandwich, huxtable)
+```
+
+
+# Cargando los datos
+
+Desde STATA
+```{r}
+ags_t321 <- read_dta("./datos/AGS_SDEMT321.dta", encoding="latin1") %>% 
+  clean_names()
+
+```
+Hoy sí filtraremos toda nuestra base para quedarnos sólo con algunas variables y casos
+```{r}
+ags_t321 %<>%
+  filter(r_def==0) %>% 
+  filter(!c_res==2) %>% 
+  filter(ing_x_hrs>0) %>% 
+  filter(clase2==1) %>% 
+  filter(anios_esc<99)
+```
+
+
+# Prueba de hipótesis para la correlación
+
+Una prueba de hipotésis sobe la correlación
+
+
+```{r}
+cor_test<-ags_t321 %>% 
+    with(
+      cor.test(ing_x_hrs, 
+               anios_esc, 
+               use = "pairwise")) # prueba de hipótesis.
+
+#dos modos de visualizar el resultado
+cor_test 
+tidy(cor_test)
+```
+
+# Modelo simple
+
+$$y=\beta_o+\beta_1x +\epsilon$$
+Donde los parámetros $\beta_o$ y $\beta_1$ describen la pendiente y el intercepto de la población, respectivamente.
+
+
+No está muy bien comportada, pero ligeramente es mejor con logaritmo
+
+```{r}
+ags_t321 %<>% 
+  mutate(log_ing_x_hrs=log(ing_x_hrs))
+```
+
+
+Una vez transformada nuestra variable, corremos el modelo
+
+```{r}
+modelo <- ags_t321 %>% 
+  with(lm(log_ing_x_hrs~anios_esc))
+
+  summary(modelo) # resultado forma1
+```
+
+Con "tidy()"
+
+```{r}
+tidy(modelo) # Pruebas de hipótesis de los coeficientes
+```
+
+Para obtener los intervalos de confianza, podemos hacerlo a partir del siguiente comando:
+
+```{r}
+confint(modelo)
+```
+
+
+Para el ajuste global del modelo, podemos utilzar el comando "glance()" sobre el objeto de nuestro modelo, ello nos dará la información correspondiente:
+```{r}
+glance(modelo) # resultado ajuste global
+
+```
+Otra manera de ver este ajuste es con el comando "anova()":
+```{r}
+anova(modelo)
+```
+
+# Diagnósticos
+
+```{r}
+plot(modelo)
+
+```
+
+##1. Outliers y Normalidad
+```{r}
+# Assessing Outliers
+car::outlierTest(modelo) # Bonferonni p-value for most extreme obs
+
+```
+
+
+```{r}
+ggpubr::ggqqplot(ags_t321$log_ing_x_hrs)
+```
+
+##2. Homocedasticidad
+
+```{r}
+# non-constant error variance test
+car::ncvTest(modelo)
+# plot studentized residuals vs. fitted values 
+car::spreadLevelPlot(modelo)
+```
+
+
+
+# Regresión Lineal múltiple
+
+## Agregando una variable categórica
+
+
+¿Es igual la relación entre hombres y mujeres con los ingresos y la escolaridad?
+```{r}
+ags_t321 %>% 
+  ggplot() +
+    aes(x=anios_esc, y=log(ing_x_hrs), alpha=I(0.5), color=as_label(sex)) + 
+  geom_jitter()+
+  geom_smooth(method = lm)
+```
+
+
+Cuando nosotros tenemos una variable categórica para la condición de sexo. [nota: seguimos haciendo el ejercicio, a pesar de que ya observamos en nuestro diagnóstico el modelo no cumple con los supuestos, pero lo haremos para fines ilustrativos]
+
+```{r}
+modelo1<-ags_t321 %>% 
+  mutate(sex=as_label(sex)) %>% 
+  with(
+    lm(log_ing_x_hrs ~anios_esc + sex)
+  )
+
+summary(modelo1)
+```
+
+
+Este modelo tiene coeficientes que deben leerse "condicionados". Es decir, en este caso tenemos que el coeficiente asociado a la edad, mantiene constante el valor de sexo y viceversa. 
+
+¿Cómo saber is ha mejorado nuestro modelo? Podemos comparar el ajuste con la anova, es decir, una prueba F
+```{r}
+pruebaf0<-anova(modelo, modelo1)
+pruebaf0
+```
+
+
+
+Como puedes ver, el resultado muestra un Df de 1 (lo que indica que el modelo más complejo tiene un parámetro adicional) y un valor p muy pequeño (<.51). Esto significa que agregar el sexo al modelo lleva a un ajuste significativamente mejor sobre el modelo original.
+
+Podemos seguir añadiendo variables sólo "sumando" en la función
+
+```{r}
+modelo2<- ags_t321 %>% 
+  mutate(sex=as_label(sex)) %>%
+  with(
+    lm(log_ing_x_hrs ~ anios_esc + sex + eda)
+    )
+summary(modelo2)
+```
+
+
+Y podemos ver si introducir esta variable afectó al ajuste global del modelo
+```{r}
+pruebaf1<-anova(modelo1, modelo2)
+pruebaf1
+```
+
+Hoy que tenemos más variables podemos hablar de revisar dos supuestos más.
+
+## Otros supuestos
+Además de los supuestos de la regresión simple, podemos revisar estos otros. De nuevo, usaremos la librería "car",
+
+1. Linealidad en los parámetros (será más díficil entre más variables tengamos)
+
+2. La normalidad también, porque debe ser multivariada
+
+3. Multicolinealidad
+La prueba más común es la de Factor Influyente de la Varianza (VIF) por sus siglas en inglés. La lógica es que la multicolinealidad tendrá efectos en nuestro R2, inflándolo. De ahí que observamos de qué variable(s) proviene este problema relacionado con la multicolinealidad.
+
+Si el valor es mayor a 5, tenemos un problema muy grave.
+
+```{r}
+car::vif(modelo2)
+```
+
+
+## Jtools
+
+Un solo modelo:
+
+```{r mytextable}
+jtools::summ(modelo)
+
+```
+
+Si queremos errores robusto, estilo *STATA*:
+
+```{r}
+summ(modelo2,  robust = "HC1")
+
+```
+Si queremos estandarizar nuestras escalas:
+
+```{r}
+summ(modelo2,  scale=T)
+
+```
+
+También se pueden comparar modelos:
+
+```{r}
+export_summs(modelo, modelo1, modelo2)
+
+```
+
+También el paquete "sjPlot" tiene el comando "plot_model()"
+
+
+```{r}
+sjPlot::plot_model(modelo1)
+sjPlot::plot_models(modelo, modelo1, modelo2)
+
+```
+
+
+# Post-estimación
+
+## Las predicciones
+
+Unos de los usos más comunes de los modelos estadísticos es la predicción
+
+```{r}
+sjPlot::plot_model(modelo2, type="pred", terms = "anios_esc")
+```
+
+También podemos incluir la predecciones para los distintos valores de las variables
+```{r}
+plot_model(modelo2, type="pred", terms = c("anios_esc","sex")) + theme_blank()
+```
+
+El orden de los términos importa:
+```{r}
+plot_model(modelo2, type="pred", terms = c("sex","anios_esc")) + theme_blank()
+```
+
+## Efectos marginales
+Con los efectos marginales, por otro lado medimos el efecto promedio, dejando el resto de variables constantes.
+
+```{r}
+plot_model(modelo2, type="eff", terms = "anios_esc")
+plot_model(modelo2, type="eff", terms = "sex")
+
+```
+¿Es el mismo gráfico que con "pred"? Veamos la ayuda
+
+¿Y si queremos ver esta informaicón graficada?
+```{r}
+eff<-plot_model(modelo2, type="eff", terms = "anios_esc")
+eff$data
+
+```
+
+
+```{r}
+eff<-plot_model(modelo2, type="pred", terms = "anios_esc")
+eff$data
+```
+
+# Extensiones del modelo de regresión
+
+## Introducción a las interacciones
+
+Muchas veces las variables explicativas van a tener relación entre sí. Por ejemplo ¿Las horas tendrá que ver con el sexo y afectan no sólo en intercepto si no también la pendiente? Para ello podemos introducir una interacción
+
+```{r}
+modelo_int1<-lm(log_ing_x_hrs ~ anios_esc * sex , data = ags_t321, na.action=na.exclude)
+summary(modelo_int1)
+```
+
+Esta interacción lo que asume es que las pendientes pueden moverse (aunque en este caso específico no lo hacen tanto porque no nos salió significativa)
+
+```{r}
+plot_model(modelo_int1, type="int", terms = c("sex", "anios_esc"))
+
+```
+
+## Efectos no lineales
+
+### Explicitando el logaritmo
+
+```{r}
+modelo_log<-ags_t321 %>% 
+  with(
+    lm(log(ing_x_hrs) ~ log(eda) + sex))
+
+summary(modelo_log)
+```
+
+
+```{r}
+plot_model(modelo_log, type="pred", terms ="eda")
+
+```
+
+### Efecto cuadrático (ojo con la sintaxis)
+
+```{r}
+modelo_quadr<-lm(log_ing_x_hrs ~ anios_esc + I(anios_esc^2) + sex, 
+                 data=ags_t321)
+summary(modelo_quadr)
+
+```
+
+Quizás con un gráfico de lo predicho tenemos más claro lo que hace ese término
+
+```{r}
+plot_model(modelo_quadr, type="pred", terms = c("anios_esc"))
+
+```
