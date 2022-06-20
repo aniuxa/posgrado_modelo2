@@ -39,6 +39,7 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 + [Práctica 1](P1.md)
 + [Código 1](P1.R)
 
++ [Cuestionario 1](https://forms.gle/hJdEciKEoxAnsd8b9) 
 
 *Sesión 2:*
 
