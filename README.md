@@ -49,14 +49,20 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 ## II. Pruebas de hipótesis e intervalos de confianza
 
 * De una sola media
-* De dos medias
-* Proporciones
-* Diferencia de proporciones
-* Chi-cuadrado de independencia
+
 
 + [Práctica 2](P2.md)
 + [Código 2](P2.R)
 
++ [Grabación 2.1] (https://youtu.be/xersTmsphQU)
++ [Grabación 2.2] (https://youtu.be/dvgk4iGQOGI)
+
+Vamos a juntar a la evaluación del día 2 con el día 3.
+
+* De dos medias
+* Proporciones
+* Diferencia de proporciones
+* Chi-cuadrado de independencia
 * Prueba ANOVA de un solo factor
 * Pruebas no parámetricas
 
