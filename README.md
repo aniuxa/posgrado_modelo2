@@ -32,7 +32,7 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 ## I. Revisión de elementos estadísticos básicos desde “tidyverse”
 
 * Tablas de múltiples entradas
-* Repaso de ggplot2
+
 
 *Sesión 1:*
 
@@ -42,7 +42,7 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 + [Cuestionario 1](https://forms.gle/hJdEciKEoxAnsd8b9) 
 
 *Sesión 2:*
-
+* Repaso de ggplot2
 
 ## II. Pruebas de hipótesis e intervalos de confianza
 
@@ -51,6 +51,10 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 * Proporciones
 * Diferencia de proporciones
 * Chi-cuadrado de independencia
+
++ [Práctica 2](P2.md)
++ [Código 2](P2.R)
+
 * Prueba ANOVA de un solo factor
 * Pruebas no parámetricas
 
