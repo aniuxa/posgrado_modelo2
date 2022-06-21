@@ -1,5 +1,5 @@
 # =============================================================================#
-# Fecha: 2022-01-11 
+# Fecha: 2022-06-21
 # Práctica 2
 # Original: Ana Escoto
 # Autor: modifiqué la versión X

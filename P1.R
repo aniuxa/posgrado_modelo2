@@ -1,6 +1,6 @@
 5+5 # Esto es una suma
 5+5
-install.packages("wesanderson")
+#install.packages("wesanderson")
 library(wesanderson)
 
 # Paquetes a utilizar ----
@@ -19,14 +19,14 @@ pacman::p_load(tidyverse, # grupo de paquetes
 
 # Cargar nuestros datos ####
 
-AGS_SDEMT321 <- haven::read_dta("datos/datos/AGS_SDEMT321.dta",
+AGS_SDEMT321 <- haven::read_dta("datos/AGS_SDEMT321.dta",
                                 encoding="latin1")
 rm(AGS_SDEMT321)
 
-ags_t321 <- haven::read_dta("datos/datos/AGS_SDEMT321.dta",
+ags_t321 <- haven::read_dta("datos/AGS_SDEMT321.dta",
                                 encoding="latin1")
 
-ICI_2021 <- readxl::read_excel("datos/datos/ICI_2021.xlsx",
+ICI_2021 <- readxl::read_excel("datos/ICI_2021.xlsx",
                                sheet = "ICI 2021")
 
 # Manipulación y revisión de datos ----
@@ -206,3 +206,7 @@ ags_t321%>%
                    edad_media=mean(eda),
                    escol_media=mean(anios_esc)) # hace cinco indicadores
 
+
+ags_t321 <-ags_t321 %>% 
+  mutate(niv_ins=replace_labels(niv_ins,
+                                labels = c(`Primaria incompleta` = 2)))
