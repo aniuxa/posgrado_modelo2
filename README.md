@@ -41,6 +41,8 @@ Iniciar clonando el proyecto de Rstudio cloud para que sea más rápido y no ten
 
 + [Cuestionario 1](https://forms.gle/hJdEciKEoxAnsd8b9) 
 
++ [Grabación 1](https://youtu.be/FGlngzUvtgM)
+
 *Sesión 2:*
 * Repaso de ggplot2
 
