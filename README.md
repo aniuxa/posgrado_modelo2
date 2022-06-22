@@ -75,6 +75,9 @@ Vamos a juntar a la evaluación del día 2 con el día 3.
 + [Práctica 3](P3.md)
 + [Código 3](P3.R)
 
++ [Grabación 3](https://youtu.be/5k8iYzajpwU)
++ [Formulario sesiones 2 y 3](https://forms.gle/pXNrX8wcbhJGYxFCA)
+
 ## IV. Introducción al modelo de regresión lineal
 
 * Simple
