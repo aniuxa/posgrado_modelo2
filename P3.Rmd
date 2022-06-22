@@ -177,6 +177,7 @@ ags_t321 %>%
 
 
 ### Un gráfico coqueto:
+Se hace con ggpubr
 
 ```{r}
 

@@ -1694,6 +1694,7 @@ paquete DescTools</p>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <div id="un-gráfico-coqueto" class="section level3">
 <h3>Un gráfico coqueto:</h3>
+<p>Se hace con ggpubr</p>
 <pre class="r"><code>ags_t321 %&gt;% 
   filter(clase2==1) %&gt;% 
   ggpubr::ggviolin(x = &quot;t_loc_tri&quot;, y = &quot;ing_x_hrs&quot;, fill = &quot;t_loc_tri&quot;,
