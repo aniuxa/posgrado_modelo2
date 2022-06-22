@@ -100,7 +100,8 @@ Wickham, H., & Grolemund, G. (2016). R for data science: Import, tidy, transform
 # Extras
 
 Imagen de un pipe
-![Alt Text](https://twitter.com/i/status/1535429654760284161)
+
+(https://twitter.com/ArthurWelle/status/1535429654760284161)
 
 # Antecedentes
 
