@@ -97,6 +97,10 @@ Wickham, H., & Grolemund, G. (2016). R for data science: Import, tidy, transform
 * [Español](https://es.r4ds.hadley.nz/)
 * [Inglés](https://r4ds.had.co.nz/)
 
+# Extras
+
+Imagen de un pipe
+![Alt Text](https://twitter.com/i/status/1535429654760284161)
 
 # Antecedentes
 
