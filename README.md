@@ -72,6 +72,8 @@ Vamos a juntar a la evaluación del día 2 con el día 3.
 * Tabulados
 * Intervalos de confianza
 
++ [Práctica 3](P3.md)
++ [Código 3](P3.R)
 
 ## IV. Introducción al modelo de regresión lineal
 
