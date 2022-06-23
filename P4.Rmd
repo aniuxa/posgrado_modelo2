@@ -1,18 +1,18 @@
 ---
-title: "Práctica 3"
+title: "Práctica 4"
 author: "Ana Escoto"
-date: "1/11/2022"
+date: "23/06/2022"
 output:
   html_document:
     toc: true
     toc_float:
       collapsed: false
       smooth_scroll: false
-  # github_document:
-  #   toc: true
-  #   toc_depth: 2
-  # pdf_document:
-  #   latex_engine: xelatex
+  github_document:
+    toc: true
+    toc_depth: 2
+  pdf_document:
+    latex_engine: xelatex
 ---
 \newpage 
 \tableofcontents 
@@ -51,7 +51,6 @@ pacman::p_load(tidyverse,
 
 # Cargando los datos
 
-Desde STATA
 ```{r}
 ags_t321 <- read_dta("./datos/AGS_SDEMT321.dta", encoding="latin1") %>% 
   clean_names()
