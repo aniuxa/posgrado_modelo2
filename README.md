@@ -85,6 +85,9 @@ Vamos a juntar a la evaluación del día 2 con el día 3.
 * Evaluación de supuestos
 * Efectos marginales
 
++ [Práctica 4](P4.md)
++ [Código 4](P4.R)
+
 ## V. Introducción a los modelos generalizados: logit
 * Simple
 * Múltiple
