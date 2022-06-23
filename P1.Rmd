@@ -3,16 +3,16 @@ title: "Práctica 1"
 author: "Ana Escoto"
 date: "1/9/2022"
 output:
-  html_document:
-    toc: true
-    toc_float:
-      collapsed: false
-      smooth_scroll: false
+#   html_document:
+#     toc: true
+#     toc_float:
+#       collapsed: false
+#       smooth_scroll: false
   # github_document:
   #   toc: true
   #   toc_depth: 2
-  # pdf_document:
-  #   latex_engine: xelatex
+  pdf_document:
+    latex_engine: xelatex
 ---
 \newpage 
 \tableofcontents 
