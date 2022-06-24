@@ -98,6 +98,8 @@ Vamos a juntar a la evaluación del día 2 con el día 3.
 + [Práctica 5](P5.md)
 + [Código 5](P5.R)
 
++ [Grabación 5] (https://youtu.be/rKGMOpb3H1U)
+
 # Bibliografía
 
 [Escoto Castillo, A. R. (2021). ¿Cómo empezar a estudiar el mercado de trabajo en México? Una introducción al análisis estadístico con R aplicado a la Encuesta Nacional de Ocupación y Empleo. Ciudad de México: Universidad Nacional Autónoma de México.](http://ciid.politicas.unam.mx/www/libros/como_empezar_estudiar_mercadotrabajo_mexico.pdf)
@@ -111,13 +113,16 @@ Wickham, H., & Grolemund, G. (2016). R for data science: Import, tidy, transform
 
 Imagen de un pipe
 
-(https://twitter.com/ArthurWelle/status/1535429654760284161)
+[tuit](https://twitter.com/ArthurWelle/status/1535429654760284161)
+
 
 # Antecedentes
 
 Este es un curso es continuación de otro realizado en 2021 puedes consultarlo [acá](https://aniuxa.github.io/CursoR-posgrado/)
 
 También hubo una versión enero de 2022 [acá](https://aniuxa.github.io/posgrado_modelo/)
+
+[Curso de introducción a R dado en 2020](https://aniuxa.github.io/CursoR-posgrado/)
 
 
 # Agradecimiento
