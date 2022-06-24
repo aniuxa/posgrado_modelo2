@@ -88,13 +88,15 @@ Vamos a juntar a la evaluación del día 2 con el día 3.
 + [Práctica 4](P4.md)
 + [Código 4](P4.R)
 
-+ [GRabación 4](https://youtu.be/6PIg4k5p8QI)
++ [Grabación 4](https://youtu.be/6PIg4k5p8QI)
 
 ## V. Introducción a los modelos generalizados: logit
 * Simple
 * Múltiple
 * Evaluación de supuestos
 
++ [Práctica 5](P5.md)
++ [Código 5](P5.R)
 
 # Bibliografía
 
